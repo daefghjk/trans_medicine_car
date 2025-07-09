@@ -16,10 +16,10 @@ void Delay_ms(int ms)
   */
 void OLED_WriteCommand(uint8_t Command)
 {
-	uint8_t buffer[3] = {OLED_ADDRESS, 0x00, Command};
-	DL_I2C_fillControllerTXFIFO(I2C_OLED_INST, buffer, 3);
+	uint8_t buffer[2] = {0x00, Command};
+	DL_I2C_fillControllerTXFIFO(I2C_OLED_INST, buffer, 2);
 	while (!(DL_I2C_getControllerStatus(I2C_OLED_INST) & DL_I2C_CONTROLLER_STATUS_IDLE));
-	DL_I2C_startControllerTransfer(I2C_OLED_INST, OLED_ADDRESS, DL_I2C_CONTROLLER_DIRECTION_TX, 3);
+	DL_I2C_startControllerTransfer(I2C_OLED_INST, OLED_ADDRESS, DL_I2C_CONTROLLER_DIRECTION_TX, 2);
 	while (DL_I2C_getControllerStatus(I2C_OLED_INST) & DL_I2C_CONTROLLER_STATUS_BUSY_BUS);
 	while (!(DL_I2C_getControllerStatus(I2C_OLED_INST) & DL_I2C_CONTROLLER_STATUS_IDLE));
 }
@@ -31,10 +31,10 @@ void OLED_WriteCommand(uint8_t Command)
   */
 void OLED_WriteData(uint8_t Data)
 {
-	uint8_t buffer[3] = {OLED_ADDRESS, 0x40, Data};
-	DL_I2C_fillControllerTXFIFO(I2C_OLED_INST, buffer, 3);
+	uint8_t buffer[2] = { 0x40, Data};
+	DL_I2C_fillControllerTXFIFO(I2C_OLED_INST, buffer, 2);
 	while (!(DL_I2C_getControllerStatus(I2C_OLED_INST) & DL_I2C_CONTROLLER_STATUS_IDLE));
-	DL_I2C_startControllerTransfer(I2C_OLED_INST, OLED_ADDRESS, DL_I2C_CONTROLLER_DIRECTION_TX, 3);
+	DL_I2C_startControllerTransfer(I2C_OLED_INST, OLED_ADDRESS, DL_I2C_CONTROLLER_DIRECTION_TX, 2);
 	while (DL_I2C_getControllerStatus(I2C_OLED_INST) & DL_I2C_CONTROLLER_STATUS_BUSY_BUS);
 	while (!(DL_I2C_getControllerStatus(I2C_OLED_INST) & DL_I2C_CONTROLLER_STATUS_IDLE));
 }

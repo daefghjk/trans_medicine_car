@@ -2,7 +2,7 @@
 #define __OLED_H__
 
 #define I2C_OLED_INST   OLED_INST
-#define OLED_ADDRESS    0x78
+#define OLED_ADDRESS    0x3C
 
 void OLED_Init(void);
 void OLED_Clear(void);
