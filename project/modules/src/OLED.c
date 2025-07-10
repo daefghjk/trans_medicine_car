@@ -2,12 +2,13 @@
 #include "ti_msp_dl_config.h"
 #include "OLEDFont.h"
 #include "OLED.h"
+#include "DELAY.h"
 
-void Delay_ms(int ms)
-{
-    while (ms--)
-        delay_cycles(CPUCLK_FREQ / 1000);
-}
+// void Delay_ms(int ms)
+// {
+//     while (ms--)
+//         delay_cycles(CPUCLK_FREQ / 1000);
+// }
 
 /**
   * @brief  OLED写命令
