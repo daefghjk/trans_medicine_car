@@ -3,6 +3,7 @@
 #include "KEY.h"
 #include "DELAY.h"
 #include "MOTOR.h"
+#include "SERVO.h"
 
 uint8_t Key_Num = 255;
 uint64_t Systick_Count = 0;
@@ -27,14 +28,18 @@ int main(void)
     SYSCFG_DL_init();
     OLED_Init();
     SysTick_Config(CPUCLK_FREQ / 1000);
-    OLED_ShowChar(1, 1, 's');
     DL_TimerA_startCounter(MOTOR_INST);
+    DL_TimerA_startCounter(SERVO_INST);
+    OLED_ShowChar(1, 1, 'K');
     while (1)
     {
         Key_Num = KEY_GetNum();
+        KEY_Act(Key_Num);
         if(Key_Num != 255)
         {
             OLED_ShowNum(2,1,Key_Num,3);
+            SERVO_SetAngle(&servo1, Key_Num*20);
+            OLED_ShowNum(3,2,servo1.current_angle,3);
         }
     }
 }
