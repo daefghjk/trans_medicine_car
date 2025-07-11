@@ -21,6 +21,7 @@ typedef struct {
     Motor_TimerType timer_type;
 
     Motor_DirectionType current_dir;
+    uint32_t current_speed;
 } Motor_Handle;
 
 void Motor_SetDirection(Motor_Handle *motor, Motor_DirectionType dir);
