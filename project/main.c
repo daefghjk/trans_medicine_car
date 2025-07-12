@@ -28,8 +28,9 @@ int main(void)
     SYSCFG_DL_init();
     OLED_Init();
     SysTick_Config(CPUCLK_FREQ / 1000);
+    Motor_Init(&motor1);
     DL_TimerA_startCounter(MOTOR_INST);
-    DL_TimerA_startCounter(SERVO_INST);
+    // DL_TimerA_startCounter(SERVO_INST);
     OLED_ShowChar(1, 1, 'K');
     while (1)
     {
@@ -38,8 +39,20 @@ int main(void)
         if(Key_Num != 255)
         {
             OLED_ShowNum(2,1,Key_Num,3);
-            SERVO_SetAngle(&servo1, Key_Num*20);
-            OLED_ShowNum(3,2,servo1.current_angle,3);
+            // SERVO_SetAngle(&servo1, Key_Num*20);
+            // OLED_ShowNum(3,2,servo1.current_angle,3);
         }
+        Key_Num = 255;
+    }
+}
+
+void KEY_Act0_Click(void)
+{
+    if (motor1.current_speed)
+        Motor_SetDirection(&motor1, MOTOR_DIR_STOP);
+    else
+    {
+        Motor_SetDirection(&motor1, MOTOR_DIR_FORWARD);
+        Motor_SetSpeed(&motor1, 50);
     }
 }

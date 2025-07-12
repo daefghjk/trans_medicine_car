@@ -16,7 +16,7 @@ typedef struct {
     GPIO_Regs * in2_port;
     uint32_t in2_pin;
 
-    GPTIMER_Regs * timer_base;            // 指向 TIMG 或 TIMA
+    GPTIMER_Regs * timer_base;
     DL_TIMER_CC_INDEX pwm_channel;
     Motor_TimerType timer_type;
 
@@ -24,6 +24,7 @@ typedef struct {
     uint32_t current_speed;
 } Motor_Handle;
 
+void Motor_Init(Motor_Handle *motor);
 void Motor_SetDirection(Motor_Handle *motor, Motor_DirectionType dir);
 void Motor_SetSpeed(Motor_Handle *motor, uint32_t percent);
 

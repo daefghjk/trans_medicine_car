@@ -87,3 +87,9 @@ void Motor_SetDirection(Motor_Handle *motor, Motor_DirectionType dir)
             break;
     }
 }
+
+void Motor_Init(Motor_Handle *motor)
+{
+    Motor_SetDirection(motor, motor->current_dir);
+    Motor_SetSpeed(motor, motor->current_speed);
+}
