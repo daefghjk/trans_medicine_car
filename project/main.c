@@ -1,9 +1,9 @@
 #include "BOARD.h"
 
-void main(void)
+int main(void)
 {
     Board_Init();
-    
+
     // DL_TimerA_startCounter(SERVO_INST);
     OLED_ShowChar(1, 1, 'K');
     while (1)
@@ -22,11 +22,11 @@ void main(void)
 
 void KEY_Act0_Click(void)
 {
-    if (motor1.current_speed)
-        Motor_SetDirection(&motor1, MOTOR_DIR_STOP);
+    if (motor0.current_speed)
+        Motor_SetDirection(&motor0, MOTOR_DIR_STOP);
     else
     {
-        Motor_SetDirection(&motor1, MOTOR_DIR_FORWARD);
-        Motor_SetSpeed(&motor1, 50);
+        Motor_SetDirection(&motor0, MOTOR_DIR_FORWARD);
+        Motor_SetSpeed(&motor0, 50);
     }
 }
