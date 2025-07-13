@@ -202,6 +202,8 @@ PWM1.ccp2PinConfig.$name                = "ti_driverlib_gpio_GPIOPinGeneric18";
 PWM1.ccp3PinConfig.$name                = "ti_driverlib_gpio_GPIOPinGeneric19";
 
 PWM2.$name                              = "SERVO";
+PWM2.clockDivider                       = 8;
+PWM2.clockPrescale                      = 100;
 PWM2.peripheral.$assign                 = "TIMA1";
 PWM2.peripheral.ccp0Pin.$assign         = "PA28";
 PWM2.peripheral.ccp1Pin.$assign         = "PA24";

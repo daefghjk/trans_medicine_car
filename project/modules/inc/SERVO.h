@@ -1,20 +1,13 @@
-#ifndef __SERVO_H__
-#define __SERVO_H__
+#ifndef __SERVO_H
+#define __SERVO_H
 
-#include "ti_msp_dl_config.h"
+void Servo_SetAngle(float Angle);
 
-typedef struct {
-    GPTIMER_Regs *timer_base;           // 定时器基址
-    DL_TIMER_CC_INDEX pwm_channel;      // PWM通道
-    uint16_t min_pulse;                 // 最小脉宽(us)
-    uint16_t max_pulse;                 // 最大脉宽(us)
-    uint16_t period;                    // PWM周期(us)
-    uint8_t current_angle;              // 当前角度
-} SERVO_Handle;
+void Servo_Angle_Limit(void);
 
-extern SERVO_Handle servo1;
-
-void SERVO_Init(SERVO_Handle *servo);
-void SERVO_SetAngle(SERVO_Handle *servo, uint8_t angle);
+void Servo_Turn_Left(float Angle_Turn);
+void Servo_Turn_Right(float Angle_Turn);
+void Servo_Turn_Stright(float Angle_Turn);
+void Servo_Angle_Turn(float Angle_Turn);
 
 #endif

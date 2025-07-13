@@ -55,4 +55,5 @@ void Board_Init(void)
     Motor_Init(&motor3);
     SysTick_Config(CPUCLK_FREQ / 1000);
     DL_TimerA_startCounter(MOTOR_INST);
+    DL_TimerA_startCounter(SERVO_INST);
 }
