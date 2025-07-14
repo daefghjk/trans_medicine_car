@@ -1,39 +1,80 @@
-#include "SERVO.h"
 #include "ti_msp_dl_config.h"
+#include "SERVO.h"
 
-// 参考 ti_msp_dl_config.h 的 SERVO_INST 和 GPIO_SERVO_C0_IDX 及引脚定义
-SERVO_Handle servo1 = {
-    .timer_base = SERVO_INST,                  // TIMA1
-    .pwm_channel = GPIO_SERVO_C0_IDX,          // DL_TIMER_CC_0_INDEX
-    .min_pulse = 500,                          // 500us
-    .max_pulse = 2500,                         // 2500us
-    .period = 20000,                           // 20ms周期（50Hz）
-    .current_angle = 90                        // 默认90度
-};
+float Servo_Angle_TurnMin;//每�?�变化的角度
+float Servo_Angle;
 
-// 角度转脉宽
-static uint16_t SERVO_AngleToPulse(SERVO_Handle *servo, uint8_t angle)
+
+void Servo_SetAngle(float Angle)	//设置角度,0-180
 {
-    if (angle > 180) angle = 180;
-    return servo->min_pulse + ((servo->max_pulse - servo->min_pulse) * angle) / 180;
+    if(Angle >= 180)
+    {
+        Servo_SetAngle(Angle - 180); 
+    }
+    else if (Angle < 0) 
+    {
+        Servo_SetAngle(Angle + 180);
+    }
+    else
+    {
+        Servo_Angle = Angle;
+        DL_TimerA_setCaptureCompareValue(SERVO_INST, 975 - Angle * 100 / 180, GPIO_SERVO_C1_IDX);
+    }
 }
 
-void SERVO_Init(SERVO_Handle *servo)
+void Servo_Angle_Limit(void)		//限制角度��?60-120
 {
-    // 这里只做结构体参数初始化，硬件定时器初始化请在主程序或外部完成
-    servo->current_angle = 90;
-    SERVO_SetAngle(servo, 90); // 默认居中
+	if(Servo_Angle >= 120)
+	{
+		Servo_Angle = 120;
+	}
+	
+	if(Servo_Angle <= 60)
+	{
+		Servo_Angle = 60;
+	}
 }
 
-void SERVO_SetAngle(SERVO_Handle *servo, uint8_t angle)
+void Servo_Turn_Right(float Angle_Turn)
 {
-    uint16_t pulse = SERVO_AngleToPulse(servo, angle);
-    uint32_t load = DL_Timer_getLoadValue(servo->timer_base);
-
-    // 计算占空比
-    uint32_t duty = (pulse * (load + 1)) / servo->period;
-    if (duty > load) duty = load;
-
-    DL_Timer_setCaptureCompareValue(servo->timer_base, duty, servo->pwm_channel);
-    servo->current_angle = angle;
+	Servo_Angle += Angle_Turn;
+	Servo_Angle_Limit();//限幅
+	Servo_SetAngle(Servo_Angle);
 }
+
+void Servo_Turn_Left(float Angle_Turn)
+{
+	Servo_Angle -= Angle_Turn;
+	Servo_Angle_Limit();//限幅
+	Servo_SetAngle(Servo_Angle);
+}
+
+void Servo_Turn_Stright(float Angle_Turn)
+{
+	if(Servo_Angle > 90)
+	{
+		Servo_Turn_Left(Angle_Turn);
+	}
+	
+	else if(Servo_Angle < 90)
+	{
+		Servo_Turn_Right(Angle_Turn);
+	}
+	
+	Servo_SetAngle(Servo_Angle);
+}
+
+//ת��
+void Servo_Angle_Turn(float Angle_Turn)
+{
+	if(Servo_Angle < 0)
+	{
+		Servo_Turn_Left(Angle_Turn);
+	}
+	
+	else if(Servo_Angle > 0)
+	{
+		Servo_Turn_Right(Angle_Turn);
+	}
+}
+

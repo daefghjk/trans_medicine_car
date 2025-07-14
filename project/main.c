@@ -21,7 +21,6 @@ int main(void)
 {
     Board_Init();
 
-    // DL_TimerA_startCounter(SERVO_INST);
     OLED_ShowChar(1, 1, 'K');
     while (1)
     {
@@ -30,7 +29,7 @@ int main(void)
         if(Key_Num != 255)
         {
             OLED_ShowNum(2,1,Key_Num,3);
-            // SERVO_SetAngle(&servo1, Key_Num*20);
+            Servo_SetAngle( Key_Num*20);
             // OLED_ShowNum(3,2,servo1.current_angle,3);
         }
         Key_Num = 255;
