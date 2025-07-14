@@ -1,5 +1,22 @@
 #include "BOARD.h"
 
+uint32_t CalculatePID(float delta)
+{
+    static float last_delta = 0;
+    uint32_t res = Kp * delta + Kd * (delta - last_delta);
+    last_delta = delta;
+    return res;
+}
+
+void Find_Line()
+{
+    uint32_t delta_speed = CalculatePID(delta_angle);
+    Motor_SetSpeed(&motor_left_front, motor_base_speed + delta_speed);
+    Motor_SetSpeed(&motor_left_back, motor_base_speed + delta_speed);
+    Motor_SetSpeed(&motor_right_front, motor_base_speed - delta_speed);
+    Motor_SetSpeed(&motor_right_back, motor_base_speed - delta_speed);
+}
+
 int main(void)
 {
     Board_Init();
@@ -17,16 +34,8 @@ int main(void)
             // OLED_ShowNum(3,2,servo1.current_angle,3);
         }
         Key_Num = 255;
-    }
-}
 
-void KEY_Act0_Click(void)
-{
-    if (motor0.current_speed)
-        Motor_SetDirection(&motor0, MOTOR_DIR_STOP);
-    else
-    {
-        Motor_SetDirection(&motor0, MOTOR_DIR_FORWARD);
-        Motor_SetSpeed(&motor0, 50);
+        OLED_ShowFloat(3, 1, delta_angle, 2, 1);
+        Find_Line();
     }
 }
