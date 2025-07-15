@@ -12,7 +12,7 @@
 extern uint8_t Key_Num;
 extern uint64_t Systick_Count;
 extern Motor_Handle motor_left_front, motor_left_back, motor_right_back, motor_right_front;
-uint32_t motor_base_speed;
+extern uint32_t motor_base_speed;
 extern float Kp, Kd;
 extern float delta_angle;
 

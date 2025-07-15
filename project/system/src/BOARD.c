@@ -58,4 +58,7 @@ void Board_Init(void)
     SysTick_Config(CPUCLK_FREQ / 1000);
     DL_TimerA_startCounter(MOTOR_INST);
     DL_TimerA_startCounter(SERVO_INST);
+    DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
+    NVIC_ClearPendingIRQ(K230_INST_INT_IRQN);
+    NVIC_EnableIRQ(K230_INST_INT_IRQN);
 }

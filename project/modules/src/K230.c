@@ -11,6 +11,7 @@ typedef enum {
 uint8_t k230_rx_buffer[K230_MAX_BUFFER_SIZE];
 uint8_t buffer_index = 0;
 float delta_angle = 0;
+char float_str[K230_MAX_BUFFER_SIZE + 1];
 
 void K230_ProcessRxData(uint8_t flag)
 {
@@ -21,7 +22,6 @@ void K230_ProcessRxData(uint8_t flag)
             break;
         
         case 0x01:
-            uint8_t float_str[buffer_index + 1];
             memcpy(float_str, k230_rx_buffer, buffer_index);
             float_str[buffer_index] = '\0';
             delta_angle = atof(float_str);
