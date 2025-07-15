@@ -15,6 +15,7 @@ extern Motor_Handle motor_left_front, motor_left_back, motor_right_back, motor_r
 extern uint32_t motor_base_speed;
 extern float Kp, Kd;
 extern float delta_angle;
+extern uint8_t find_line_en;
 
 void Board_Init(void);
 

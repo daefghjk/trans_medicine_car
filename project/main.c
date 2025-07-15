@@ -13,8 +13,16 @@ void Find_Line()
     uint32_t delta_speed = CalculatePID(delta_angle);
     Motor_SetSpeed(&motor_left_front, motor_base_speed + delta_speed);
     Motor_SetSpeed(&motor_left_back, motor_base_speed + delta_speed);
-    Motor_SetSpeed(&motor_right_front, motor_base_speed - delta_speed);
-    Motor_SetSpeed(&motor_right_back, motor_base_speed - delta_speed);
+    if (motor_base_speed - delta_speed < 0)
+    {
+        Motor_SetSpeed(&motor_right_front, 0);
+        Motor_SetSpeed(&motor_right_back, 0);
+    }
+    else
+    {
+        Motor_SetSpeed(&motor_right_front, motor_base_speed - delta_speed);
+        Motor_SetSpeed(&motor_right_back, motor_base_speed - delta_speed);
+    }
 }
 
 int main(void)
@@ -35,6 +43,6 @@ int main(void)
         Key_Num = 255;
 
         OLED_ShowFloat(3, 1, delta_angle, 2, 1);
-        Find_Line();
+        if (find_line_en) Find_Line();
     }
 }

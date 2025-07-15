@@ -17,14 +17,46 @@ void K230_ProcessRxData(uint8_t flag)
 {
     switch (flag)
     {
-        case 0x00:
-            
+        case K230_FLAG_DIR:
+            if (buffer_index > 1) break;
+            switch (k230_rx_buffer[0])
+            {
+                case 's':
+                    find_line_en = 0;
+                    Motor_SetDirection(&motor_left_front, MOTOR_DIR_STOP);
+                    Motor_SetDirection(&motor_right_front, MOTOR_DIR_STOP);
+                    Motor_SetDirection(&motor_left_back, MOTOR_DIR_STOP);
+                    Motor_SetDirection(&motor_right_back, MOTOR_DIR_STOP);
+                    break;
+                
+                case 'f':
+                    find_line_en = 1;
+                    Motor_SetDirection(&motor_left_front, MOTOR_DIR_FORWARD);
+                    Motor_SetDirection(&motor_right_front, MOTOR_DIR_FORWARD);
+                    Motor_SetDirection(&motor_left_back, MOTOR_DIR_FORWARD);
+                    Motor_SetDirection(&motor_right_back, MOTOR_DIR_FORWARD);
+                    break;
+                
+                case 'l':
+                    find_line_en = 0;
+                    break;
+
+                case 'r':
+                    find_line_en = 0;
+                    break;
+                
+                default:
+                    break;
+            }
             break;
         
-        case 0x01:
+        case K230_FLAG_ANGLE:
             memcpy(float_str, k230_rx_buffer, buffer_index);
             float_str[buffer_index] = '\0';
             delta_angle = atof(float_str);
+            break;
+
+        default:
             break;
     }
 }
