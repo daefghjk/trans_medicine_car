@@ -2,8 +2,8 @@
 
 uint8_t Key_Num = 255;
 uint64_t Systick_Count = 0;
-float Kp = 0.01, Kd = 0.01;
-uint32_t motor_base_speed = 50;
+float Kp = 0.7, Kd = 0;
+uint32_t motor_base_speed = 40;
 uint8_t find_line_en = 0;
 
 Motor_Handle motor_left_front = {
