@@ -26,6 +26,6 @@ typedef struct {
 
 void Motor_Init(Motor_Handle *motor);
 void Motor_SetDirection(Motor_Handle *motor, Motor_DirectionType dir);
-void Motor_SetSpeed(Motor_Handle *motor, uint32_t percent);
+void Motor_SetSpeed(Motor_Handle *motor, int16_t percent);
 
 #endif

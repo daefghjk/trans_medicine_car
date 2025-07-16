@@ -41,9 +41,10 @@ void PWM_SetDuty(GPTIMER_Regs *gpt, DL_TIMER_CC_INDEX ccIndex, uint32_t duty_per
     DL_Timer_setCaptureCompareValue(gpt, cmpx - 1, ccIndex);
 }
 
-void Motor_SetSpeed(Motor_Handle *motor, uint32_t percent)
+void Motor_SetSpeed(Motor_Handle *motor, int16_t percent)
 {
     if (percent > 100) percent = 100;
+    if (percent < 0) percent = 0;
     motor->current_speed = percent;
 
     uint32_t effective_percent;

@@ -1,10 +1,11 @@
 #include "BOARD.h"
 
 uint8_t Key_Num = 255;
-uint64_t Systick_Count = 0;
-float Kp = 0.7, Kd = 0;
+volatile uint64_t Systick_Count = 0;
+float Kp = 1, Kd = 0.01;
 uint32_t motor_base_speed = 40;
-uint8_t find_line_en = 0;
+volatile uint8_t find_line_en = 0;
+volatile uint8_t turn_dir = '\0';
 
 Motor_Handle motor_left_front = {
     .in2_port = GPIO_MOTOR_DIR_PORT,
@@ -62,4 +63,14 @@ void Board_Init(void)
     DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
     NVIC_ClearPendingIRQ(K230_INST_INT_IRQN);
     NVIC_EnableIRQ(K230_INST_INT_IRQN);
+    NVIC_ClearPendingIRQ(GPIO_ENCODER_INT_IRQN);
+    NVIC_EnableIRQ(GPIO_ENCODER_INT_IRQN);
+}
+
+void Motor_SetAllDir(Motor_DirectionType dir)
+{
+    Motor_SetDirection(&motor_left_front, dir);
+    Motor_SetDirection(&motor_right_front, dir);
+    Motor_SetDirection(&motor_left_back, dir);
+    Motor_SetDirection(&motor_right_back, dir);
 }

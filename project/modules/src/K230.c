@@ -10,7 +10,7 @@ typedef enum {
 
 uint8_t k230_rx_buffer[K230_MAX_BUFFER_SIZE];
 uint8_t buffer_index = 0;
-float delta_angle = 0;
+volatile float delta_angle = 0;
 char float_str[K230_MAX_BUFFER_SIZE + 1];
 
 void K230_ProcessRxData(uint8_t flag)
@@ -19,35 +19,7 @@ void K230_ProcessRxData(uint8_t flag)
     {
         case K230_FLAG_DIR:
             if (buffer_index > 1) break;
-            switch (k230_rx_buffer[0])
-            {
-                case 's':
-                    find_line_en = 0;
-                    Motor_SetDirection(&motor_left_front, MOTOR_DIR_STOP);
-                    Motor_SetDirection(&motor_right_front, MOTOR_DIR_STOP);
-                    Motor_SetDirection(&motor_left_back, MOTOR_DIR_STOP);
-                    Motor_SetDirection(&motor_right_back, MOTOR_DIR_STOP);
-                    break;
-                
-                case 'f':
-                    find_line_en = 1;
-                    Motor_SetDirection(&motor_left_front, MOTOR_DIR_FORWARD);
-                    Motor_SetDirection(&motor_right_front, MOTOR_DIR_FORWARD);
-                    Motor_SetDirection(&motor_left_back, MOTOR_DIR_FORWARD);
-                    Motor_SetDirection(&motor_right_back, MOTOR_DIR_FORWARD);
-                    break;
-                
-                case 'l':
-                    find_line_en = 0;
-                    break;
-
-                case 'r':
-                    find_line_en = 0;
-                    break;
-                
-                default:
-                    break;
-            }
+            turn_dir =  k230_rx_buffer[0];
             break;
         
         case K230_FLAG_ANGLE:
