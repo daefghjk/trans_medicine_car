@@ -104,10 +104,6 @@ void Rotate_Angle(float angle_deg)
         Motor_SetDirection(&motor_left_back, MOTOR_DIR_FORWARD);
         Motor_SetDirection(&motor_right_front, MOTOR_DIR_BACKWARD);
         Motor_SetDirection(&motor_right_back, MOTOR_DIR_BACKWARD);
-        Motor_SetSpeed(&motor_left_front, 60);
-        Motor_SetSpeed(&motor_right_front, 50);
-        Motor_SetSpeed(&motor_left_back, 60);
-        Motor_SetSpeed(&motor_right_back, 50);
     }
     else
     {
@@ -115,13 +111,19 @@ void Rotate_Angle(float angle_deg)
         Motor_SetDirection(&motor_left_back, MOTOR_DIR_BACKWARD);
         Motor_SetDirection(&motor_right_front, MOTOR_DIR_FORWARD);
         Motor_SetDirection(&motor_right_back, MOTOR_DIR_FORWARD);
-        Motor_SetSpeed(&motor_left_front, 50);
-        Motor_SetSpeed(&motor_right_front, 60);
-        Motor_SetSpeed(&motor_left_back, 50);
-        Motor_SetSpeed(&motor_right_back, 60);
     }
 
-
+    int steps = 50; // 分50步完成加速
+    int delay_per_step = 200 / steps;
+    for (int i = 1; i <= steps; i++)
+    {
+        int current_speed = (50 * i) / steps;
+        Motor_SetSpeed(&motor_left_front, current_speed);
+        Motor_SetSpeed(&motor_left_back, current_speed);
+        Motor_SetSpeed(&motor_right_front, current_speed);
+        Motor_SetSpeed(&motor_right_back, current_speed);
+        Delay_ms(delay_per_step);
+    }
 
     while (1)
     {
@@ -132,7 +134,7 @@ void Rotate_Angle(float angle_deg)
         OLED_ShowSignedNum(3, 1, current_left_count, 10);
         OLED_ShowSignedNum(4, 1, current_right_count, 10);
 
-        if ((abs(current_left_count) >= target_count &&  abs(current_right_count) >= target_count))
+        if ((abs(current_left_count) >= target_count ||  abs(current_right_count) >= target_count))
             break;
     }
 
@@ -171,10 +173,10 @@ int main(void)
                 DL_UART_Main_disableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 find_line_en = 0;
                 Move_Meter(0.3);
-                Rotate_Angle(-90);
+                Rotate_Angle(-110);
                 Motor_SetAllDir(MOTOR_DIR_FORWARD);
+                turn_dir = 'f';
                 find_line_en = 1;
-
                 DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 break;
             case 'r':
@@ -190,10 +192,22 @@ int main(void)
             case 'b':
                 DL_UART_Main_disableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 find_line_en = 0;
-                Rotate_Angle(180);
+                Move_Meter(0.1);
+                Rotate_Angle(245);
+                uint8_t buffer[4] = {0xff, 0x00, 'm', 0xfe};
+                for (uint8_t i = 0; i < 4; ++i)
+                    DL_UART_Main_transmitDataBlocking(K230_INST, buffer[i]);
                 Motor_SetAllDir(MOTOR_DIR_FORWARD);
                 turn_dir = 'f';
                 find_line_en = 1;
+                DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
+                break;
+            case 'y':
+                DL_UART_Main_disableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
+                find_line_en = 0;
+                Move_Meter(0.2);
+                Motor_SetAllDir(MOTOR_DIR_STOP);
+                turn_dir = '\0';
                 DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 break;
             default:
