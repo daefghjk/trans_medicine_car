@@ -445,7 +445,7 @@ def detection_and_line_following():
             # 返程count为0后，检测小黑色矩形块
             if return_count <= 0:
                 img = sensor.snapshot(chn=CAM_CHN_ID_1)
-                blobs = img.find_blobs(LINE_THRESHOLD, merge=True, color=True)
+                blobs = img.find_blobs([(0, 40, -128, 127, -128, 127)], merge=True, color=True)
                 rect_count = 0
                 for b in blobs:
                     area = b.w() * b.h()
