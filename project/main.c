@@ -32,8 +32,6 @@ void Move_Meter(float meter)
     if (!dir) meter = -meter;
     uint64_t target_count = meter / (3.14159265 * WHELL_DIAMETER / ENCODER_PPR);
 
-    OLED_ShowNum(2, 1, target_count, 10);
-
     Motor_SetAllDir(MOTOR_DIR_STOP);
 
     DL_GPIO_disableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_L_A_PIN | GPIO_ENCODER_ENCODER_R_A_PIN);
@@ -50,15 +48,10 @@ void Move_Meter(float meter)
         current_right_count = right_count;
         DL_GPIO_enableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_L_A_PIN | GPIO_ENCODER_ENCODER_R_A_PIN);
 
-        OLED_ShowSignedNum(3, 1, current_left_count, 10);
-        OLED_ShowSignedNum(4, 1, current_right_count, 10);
-
         if ((abs(current_left_count) + abs(current_right_count)) / 2 >= target_count)
             break;
 
-        int32_t delta = 0.5 * (current_left_count - current_right_count);
-
-        delta = 0;//暂时屏蔽p控制直线行走
+        int32_t delta = 0.2 * (abs(current_left_count) - abs(current_right_count));
 
         int32_t left_speed = motor_base_speed - delta;
         int32_t right_speed = motor_base_speed + delta;
@@ -85,8 +78,6 @@ void Rotate_Angle(float angle_deg)
     float angle_rad = angle_deg * (3.14159265 / 180);
     uint64_t target_count = angle_rad * ROTARY_SHAFT_DIS / (3.14159265 * WHELL_DIAMETER / ENCODER_PPR);
 
-    OLED_ShowNum(2, 1, target_count, 10);
-
     Motor_SetAllDir(MOTOR_DIR_STOP);
 
     DL_GPIO_disableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_L_A_PIN | GPIO_ENCODER_ENCODER_R_A_PIN);
@@ -105,8 +96,8 @@ void Rotate_Angle(float angle_deg)
         Motor_SetDirection(&motor_right, MOTOR_DIR_FORWARD);
     }
 
-    Motor_SetSpeed(&motor_left, 40);
-    Motor_SetSpeed(&motor_right, 40);
+    Motor_SetSpeed(&motor_left, 35);
+    Motor_SetSpeed(&motor_right, 35);
 
     while (1)
     {
@@ -114,8 +105,6 @@ void Rotate_Angle(float angle_deg)
         current_left_count = left_count;
         current_right_count = right_count;
         DL_GPIO_enableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_L_A_PIN | GPIO_ENCODER_ENCODER_R_A_PIN);
-        OLED_ShowSignedNum(3, 1, current_left_count, 10);
-        OLED_ShowSignedNum(4, 1, current_right_count, 10);
 
         if ((abs(current_left_count) >= target_count ||  abs(current_right_count) >= target_count))
             break;
@@ -127,6 +116,9 @@ void Rotate_Angle(float angle_deg)
 int main(void)
 {
     Board_Init();
+
+    while (DL_GPIO_readPins(GPIO_INFRARED_PORT, GPIO_INFRARED_PIN_INFRARED_PIN));
+    turn_dir = 'f';
 
     while (1)
     {
@@ -155,8 +147,8 @@ int main(void)
             case 'l':
                 DL_UART_Main_disableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 find_line_en = 0;
-                Move_Meter(0.3);
-                Rotate_Angle(-90);
+                Move_Meter(0.4);
+                Rotate_Angle(-130);
                 Motor_SetAllDir(MOTOR_DIR_FORWARD);
                 turn_dir = 'f';
                 find_line_en = 1;
@@ -165,8 +157,8 @@ int main(void)
             case 'r':
                 DL_UART_Main_disableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 find_line_en = 0;
-                Move_Meter(0.3);
-                Rotate_Angle(90);
+                Move_Meter(0.43);
+                Rotate_Angle(120);
                 Motor_SetAllDir(MOTOR_DIR_FORWARD);
                 turn_dir = 'f';
                 find_line_en = 1;
@@ -175,12 +167,22 @@ int main(void)
             case 'b':
                 DL_UART_Main_disableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 find_line_en = 0;
-                Move_Meter(0.1);
-                Rotate_Angle(180);
-                uint8_t buffer[4] = {0xff, 0x00, 'm', 0xfe};
-                for (uint8_t i = 0; i < 4; ++i)
-                    DL_UART_Main_transmitDataBlocking(K230_INST, buffer[i]);
-                Motor_SetAllDir(MOTOR_DIR_FORWARD);
+                Move_Meter(0.3);
+                Rotate_Angle(240);
+                BLE_SendCmd('t');   //测试是否有小车2
+                Delay_ms(2000);
+                if (ble_flag == 'r')
+                {
+                    mode = 2;
+                    ble_flag = '0';
+                    while (ble_flag != 'b');
+                }
+                else
+                    mode = 1;
+                while (!DL_GPIO_readPins(GPIO_INFRARED_PORT, GPIO_INFRARED_PIN_INFRARED_PIN));
+                K230_SendCmd('m');
+                if (mode == 2)
+                    BLE_SendCmd('f');
                 turn_dir = 'f';
                 find_line_en = 1;
                 DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
@@ -190,7 +192,7 @@ int main(void)
                 find_line_en = 0;
                 Move_Meter(0.2);
                 Motor_SetAllDir(MOTOR_DIR_STOP);
-                turn_dir = '\0';
+                turn_dir = '0';
                 DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 break;
             default:

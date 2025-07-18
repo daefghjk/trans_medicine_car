@@ -84,3 +84,15 @@ void K230_INST_IRQHandler(void)
             break;
     }
 }
+
+void K230_SendBytes(uint8_t buffer[], uint8_t length)
+{
+    for (uint8_t i = 0; i < length; ++i)
+        DL_UART_Main_transmitDataBlocking(K230_INST, buffer[i]);
+}
+
+void K230_SendCmd(uint8_t cmd)
+{
+    uint8_t buffer[4] = {K230_START_FRAME, K230_FLAG_CMD, cmd, K230_END_FRAME};
+    K230_SendBytes(buffer, 4);
+}
