@@ -11,11 +11,11 @@
 #include "ENCODER.h"
 
 #define WHELL_DIAMETER      0.065   //车轮直径
-#define ROTARY_SHAFT_DIS    0.105   //转轴距离
+#define ROTARY_SHAFT_DIS    0.09   //转轴距离
 
 extern uint8_t Key_Num;
 extern volatile uint64_t Systick_Count;
-extern Motor_Handle motor_left_front, motor_left_back, motor_right_back, motor_right_front;
+extern Motor_Handle motor_left, motor_right;
 extern uint32_t motor_base_speed;
 extern float Kp, Kd;
 extern volatile float delta_angle;
@@ -26,5 +26,6 @@ extern volatile uint8_t turn_dir;
 
 void Board_Init(void);
 void Motor_SetAllDir(Motor_DirectionType dir);
+void Motor_SetAllSpeed(uint16_t percent);
 
 #endif

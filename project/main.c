@@ -21,10 +21,8 @@ void Find_Line(void)
     if (right_speed > 100) right_speed = 100;
     if (right_speed < 0) right_speed = 0;
 
-    Motor_SetSpeed(&motor_left_front, left_speed);
-    Motor_SetSpeed(&motor_left_back, left_speed);
-    Motor_SetSpeed(&motor_right_front, right_speed);
-    Motor_SetSpeed(&motor_right_back, right_speed);
+    Motor_SetSpeed(&motor_left, left_speed);
+    Motor_SetSpeed(&motor_right, right_speed);
 }
 
 void Move_Meter(float meter)
@@ -38,19 +36,19 @@ void Move_Meter(float meter)
 
     Motor_SetAllDir(MOTOR_DIR_STOP);
 
-    DL_GPIO_disableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_0_A_PIN | GPIO_ENCODER_ENCODER_3_A_PIN);
+    DL_GPIO_disableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_L_A_PIN | GPIO_ENCODER_ENCODER_R_A_PIN);
     left_count = 0;
     right_count = 0;
-    DL_GPIO_enableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_0_A_PIN | GPIO_ENCODER_ENCODER_3_A_PIN);
+    DL_GPIO_enableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_L_A_PIN | GPIO_ENCODER_ENCODER_R_A_PIN);
 
     Motor_SetAllDir(MOTOR_DIR_FORWARD);
 
     while (1)
     {
-        DL_GPIO_disableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_0_A_PIN | GPIO_ENCODER_ENCODER_3_A_PIN);
+        DL_GPIO_disableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_L_A_PIN | GPIO_ENCODER_ENCODER_R_A_PIN);
         current_left_count = left_count;
         current_right_count = right_count;
-        DL_GPIO_enableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_0_A_PIN | GPIO_ENCODER_ENCODER_3_A_PIN);
+        DL_GPIO_enableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_L_A_PIN | GPIO_ENCODER_ENCODER_R_A_PIN);
 
         OLED_ShowSignedNum(3, 1, current_left_count, 10);
         OLED_ShowSignedNum(4, 1, current_right_count, 10);
@@ -60,7 +58,7 @@ void Move_Meter(float meter)
 
         int32_t delta = 0.5 * (current_left_count - current_right_count);
 
-        delta = 0;
+        delta = 0;//暂时屏蔽p控制直线行走
 
         int32_t left_speed = motor_base_speed - delta;
         int32_t right_speed = motor_base_speed + delta;
@@ -69,10 +67,8 @@ void Move_Meter(float meter)
         if (right_speed > 100) right_speed = 100;
         if (right_speed < 0) right_speed = 0;
 
-        Motor_SetSpeed(&motor_left_front, left_speed);
-        Motor_SetSpeed(&motor_left_back, left_speed);
-        Motor_SetSpeed(&motor_right_front, right_speed);
-        Motor_SetSpeed(&motor_right_back, right_speed);
+        Motor_SetSpeed(&motor_left, left_speed);
+        Motor_SetSpeed(&motor_right, right_speed);
 
         Delay_ms(10);
     }
@@ -93,44 +89,31 @@ void Rotate_Angle(float angle_deg)
 
     Motor_SetAllDir(MOTOR_DIR_STOP);
 
-    DL_GPIO_disableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_0_A_PIN | GPIO_ENCODER_ENCODER_3_A_PIN);
+    DL_GPIO_disableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_L_A_PIN | GPIO_ENCODER_ENCODER_R_A_PIN);
     left_count = 0;
     right_count = 0;
-    DL_GPIO_enableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_0_A_PIN | GPIO_ENCODER_ENCODER_3_A_PIN);
+    DL_GPIO_enableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_L_A_PIN | GPIO_ENCODER_ENCODER_R_A_PIN);
 
     if (dir)
     {
-        Motor_SetDirection(&motor_left_front, MOTOR_DIR_FORWARD);
-        Motor_SetDirection(&motor_left_back, MOTOR_DIR_FORWARD);
-        Motor_SetDirection(&motor_right_front, MOTOR_DIR_BACKWARD);
-        Motor_SetDirection(&motor_right_back, MOTOR_DIR_BACKWARD);
+        Motor_SetDirection(&motor_left, MOTOR_DIR_FORWARD);
+        Motor_SetDirection(&motor_right, MOTOR_DIR_BACKWARD);
     }
     else
     {
-        Motor_SetDirection(&motor_left_front, MOTOR_DIR_BACKWARD);
-        Motor_SetDirection(&motor_left_back, MOTOR_DIR_BACKWARD);
-        Motor_SetDirection(&motor_right_front, MOTOR_DIR_FORWARD);
-        Motor_SetDirection(&motor_right_back, MOTOR_DIR_FORWARD);
+        Motor_SetDirection(&motor_left, MOTOR_DIR_BACKWARD);
+        Motor_SetDirection(&motor_right, MOTOR_DIR_FORWARD);
     }
 
-    int steps = 50; // 分50步完成加速
-    int delay_per_step = 200 / steps;
-    for (int i = 1; i <= steps; i++)
-    {
-        int current_speed = (50 * i) / steps;
-        Motor_SetSpeed(&motor_left_front, current_speed);
-        Motor_SetSpeed(&motor_left_back, current_speed);
-        Motor_SetSpeed(&motor_right_front, current_speed);
-        Motor_SetSpeed(&motor_right_back, current_speed);
-        Delay_ms(delay_per_step);
-    }
+    Motor_SetSpeed(&motor_left, 40);
+    Motor_SetSpeed(&motor_right, 40);
 
     while (1)
     {
-        DL_GPIO_disableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_0_A_PIN | GPIO_ENCODER_ENCODER_3_A_PIN);
+        DL_GPIO_disableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_L_A_PIN | GPIO_ENCODER_ENCODER_R_A_PIN);
         current_left_count = left_count;
         current_right_count = right_count;
-        DL_GPIO_enableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_0_A_PIN | GPIO_ENCODER_ENCODER_3_A_PIN);
+        DL_GPIO_enableInterrupt(GPIO_ENCODER_PORT, GPIO_ENCODER_ENCODER_L_A_PIN | GPIO_ENCODER_ENCODER_R_A_PIN);
         OLED_ShowSignedNum(3, 1, current_left_count, 10);
         OLED_ShowSignedNum(4, 1, current_right_count, 10);
 
@@ -173,7 +156,7 @@ int main(void)
                 DL_UART_Main_disableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 find_line_en = 0;
                 Move_Meter(0.3);
-                Rotate_Angle(-110);
+                Rotate_Angle(-90);
                 Motor_SetAllDir(MOTOR_DIR_FORWARD);
                 turn_dir = 'f';
                 find_line_en = 1;
@@ -193,7 +176,7 @@ int main(void)
                 DL_UART_Main_disableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 find_line_en = 0;
                 Move_Meter(0.1);
-                Rotate_Angle(245);
+                Rotate_Angle(180);
                 uint8_t buffer[4] = {0xff, 0x00, 'm', 0xfe};
                 for (uint8_t i = 0; i < 4; ++i)
                     DL_UART_Main_transmitDataBlocking(K230_INST, buffer[i]);

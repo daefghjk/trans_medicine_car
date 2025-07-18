@@ -2,41 +2,23 @@
 
 uint8_t Key_Num = 255;
 volatile uint64_t Systick_Count = 0;
-float Kp = 1, Kd = 0.01;
+float Kp = 0.7, Kd = 0.01;
 uint32_t motor_base_speed = 40;
 volatile uint8_t find_line_en = 0;
 volatile uint8_t turn_dir = '\0';
 
-Motor_Handle motor_left_front = {
+Motor_Handle motor_left = {
     .in2_port = GPIO_MOTOR_DIR_PORT,
-    .in2_pin = GPIO_MOTOR_DIR_MOTOR_0_PIN,
-    .timer_type = MOTOR_TIMER_TIMA,
-    .timer_base = MOTOR_INST,
-    .pwm_channel = GPIO_MOTOR_C0_IDX,
-    .current_dir = MOTOR_DIR_FORWARD,
-    .current_speed = 0
-};
-Motor_Handle motor_left_back = {
-    .in2_port = GPIO_MOTOR_DIR_PORT,
-    .in2_pin = GPIO_MOTOR_DIR_MOTOR_1_PIN,
-    .timer_type = MOTOR_TIMER_TIMA,
-    .timer_base = MOTOR_INST,
-    .pwm_channel = GPIO_MOTOR_C1_IDX,
-    .current_dir = MOTOR_DIR_FORWARD,
-    .current_speed = 0
-};
-Motor_Handle motor_right_back = {
-    .in2_port = GPIO_MOTOR_DIR_PORT,
-    .in2_pin = GPIO_MOTOR_DIR_MOTOR_2_PIN,
+    .in2_pin = GPIO_MOTOR_DIR_MOTOR_L_PIN,
     .timer_type = MOTOR_TIMER_TIMA,
     .timer_base = MOTOR_INST,
     .pwm_channel = GPIO_MOTOR_C2_IDX,
     .current_dir = MOTOR_DIR_FORWARD,
     .current_speed = 0
 };
-Motor_Handle motor_right_front = {
+Motor_Handle motor_right = {
     .in2_port = GPIO_MOTOR_DIR_PORT,
-    .in2_pin = GPIO_MOTOR_DIR_MOTOR_3_PIN,
+    .in2_pin = GPIO_MOTOR_DIR_MOTOR_R_PIN,
     .timer_type = MOTOR_TIMER_TIMA,
     .timer_base = MOTOR_INST,
     .pwm_channel = GPIO_MOTOR_C3_IDX,
@@ -53,10 +35,8 @@ void Board_Init(void)
 {
     SYSCFG_DL_init();
     OLED_Init();
-    Motor_Init(&motor_left_front);
-    Motor_Init(&motor_left_back);
-    Motor_Init(&motor_right_back);
-    Motor_Init(&motor_right_front);
+    Motor_Init(&motor_left);
+    Motor_Init(&motor_right);
     SysTick_Config(CPUCLK_FREQ / 1000);
     DL_TimerA_startCounter(MOTOR_INST);
     DL_TimerA_startCounter(SERVO_INST);
@@ -69,8 +49,12 @@ void Board_Init(void)
 
 void Motor_SetAllDir(Motor_DirectionType dir)
 {
-    Motor_SetDirection(&motor_left_front, dir);
-    Motor_SetDirection(&motor_right_front, dir);
-    Motor_SetDirection(&motor_left_back, dir);
-    Motor_SetDirection(&motor_right_back, dir);
+    Motor_SetDirection(&motor_left, dir);
+    Motor_SetDirection(&motor_right, dir);
+}
+
+void Motor_SetAllSpeed(uint16_t percent)
+{
+    Motor_SetSpeed(&motor_left, percent);
+    Motor_SetSpeed(&motor_right, percent);
 }
