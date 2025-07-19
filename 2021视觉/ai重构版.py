@@ -11,8 +11,6 @@ from machine import FPIOA, Pin, UART
 from media.display import *
 from media.media import *
 from media.sensor import *
-# 假设 get_colors 和 ALIGN_UP 函数来自该库
-from libs.Utils import ALIGN_UP, get_colors
 
 # ==============================================================================
 # 1. 配置参数 (Constants)
@@ -92,7 +90,7 @@ class LineFollowingCar:
         self.pause_until_time = 0
 
         self.uart_rx_buf = bytearray()
-        
+
         # OSD显示缓存
         self.osd_info = {
             "mode": "识别模式",
@@ -128,10 +126,10 @@ class LineFollowingCar:
         # Chn2: For AI Detection (RGB888P)
         self.sensor.set_framesize(width=AI_INPUT_WIDTH, height=AI_INPUT_HEIGHT, chn=CAM_CHN_ID_2)
         self.sensor.set_pixformat(PIXEL_FORMAT_RGB_888_PLANAR, chn=CAM_CHN_ID_2)
-        
+
         sensor_bind_info = self.sensor.bind_info(x=0, y=0, chn=CAM_CHN_ID_0)
         Display.bind_layer(**sensor_bind_info, layer=Display.LAYER_VIDEO1)
-        
+
         # 3. UART
         fpioa = FPIOA()
         fpioa.set_function(3, FPIOA.UART1_TXD)
@@ -153,7 +151,7 @@ class LineFollowingCar:
 
         self.ai_labels = self.ai_config["categories"]
         kmodel_frame_size = self.ai_config["img_size"]
-        
+
         # 1. KPU
         self.kpu = nn.kpu()
         self.kpu.load_kmodel(ROOT_PATH + self.ai_config["kmodel_path"])
@@ -167,9 +165,9 @@ class LineFollowingCar:
         ai2d.set_dtype(nn.ai2d_format.NCHW_FMT, nn.ai2d_format.NCHW_FMT, np.uint8, np.uint8)
         ai2d.set_pad_param(True, [0, 0, 0, 0, top, bottom, left, right], 0, [114, 114, 114])
         ai2d.set_resize_param(True, nn.interp_method.tf_bilinear, nn.interp_mode.half_pixel)
-        
+
         self.ai2d_builder = ai2d.build(
-            [1, 3, AI_INPUT_HEIGHT, AI_INPUT_WIDTH], 
+            [1, 3, AI_INPUT_HEIGHT, AI_INPUT_WIDTH],
             [1, 3, kmodel_frame_size[1], kmodel_frame_size[0]]
         )
 
@@ -217,17 +215,17 @@ class LineFollowingCar:
             # 滑动窗口查找指令包 [0xFF, 0x00, 'm', 0xFE]
             if (self.uart_rx_buf[0] == 0xff and self.uart_rx_buf[1] == 0x00 and \
                 self.uart_rx_buf[2] == ord('m') and self.uart_rx_buf[3] == 0xfe):
-                
+
                 self.osd_info["rx"] = "CMD: m"
                 print("RX < CMD: m")
-                
+
                 if self.mode == MODE_WAIT_M:
                     print("Received 'm', starting return trip.")
                     self.is_returning = True
                     self.return_trip_crosses = self.cross_count
                     self.black_marker_found = False
                     self.mode = MODE_LINE
-                
+
                 self.uart_rx_buf = self.uart_rx_buf[4:]
             else:
                 self.uart_rx_buf = self.uart_rx_buf[1:]
@@ -253,7 +251,7 @@ class LineFollowingCar:
             # 根据面积和长宽比筛选
             if 500 < (b.w() * b.h()) < 5000 and 0.5 < (b.w() / b.h() if b.h() > 0 else 0) < 2.0:
                 rect_count += 1
-        
+
         if rect_count < 6:
             return False
 
@@ -266,7 +264,7 @@ class LineFollowingCar:
         if not red_blobs:
             print("Red line disappeared. End of track confirmed.")
             return True
-            
+
         return False
 
     def _line_detection(self, img, osd_img):
@@ -275,7 +273,7 @@ class LineFollowingCar:
         """
         centroid_sum = 0
         cross_detected = False
-        
+
         # ROI权重和中心位置
         roi_weights = [r[4] for r in ROIS]
         roi_centers = [None] * len(ROIS)
@@ -289,14 +287,14 @@ class LineFollowingCar:
                 largest_blob = max(blobs, key=lambda b: b.pixels())
                 # 在OSD上绘制检测框
                 osd_img.draw_rectangle(largest_blob.rect(), color=(255, 255, 255), thickness=2)
-                
+
                 # 检查色块是否过宽（可能是路口）
                 if largest_blob.w() > OVERWIDE_THRESH:
                     is_roi_valid[i] = False
                     overwide_count += 1
                 else:
                     roi_centers[i] = largest_blob.cx()
-                
+
                 # 仅使用最上方的ROI检测路口（宽度超过400像素）
                 if i == 2 and largest_blob.w() > 400:
                     cross_detected = True
@@ -322,7 +320,7 @@ class LineFollowingCar:
         self.ai2d_builder.run(self.ai2d_input_tensor, self.ai2d_output_tensor)
         self.kpu.set_input_tensor(0, self.ai2d_output_tensor)
         self.kpu.run()
-        
+
         results = []
         for i in range(self.kpu.outputs_size()):
             data = self.kpu.get_output_tensor(i).to_numpy()
@@ -330,7 +328,7 @@ class LineFollowingCar:
 
         cfg = self.ai_config
         anchors = cfg["anchors"][0] + cfg["anchors"][1] + cfg["anchors"][2]
-        
+
         det_boxes = aicube.anchorbasedet_post_process(
             results[0], results[1], results[2],
             cfg["img_size"], [AI_INPUT_WIDTH, AI_INPUT_HEIGHT],
@@ -342,7 +340,7 @@ class LineFollowingCar:
     def _update_osd(self):
         """统一更新OSD上的所有信息"""
         self.osd_img.clear()
-        
+
         # 模式
         self.osd_img.draw_string_advanced(DISPLAY_WIDTH - 200, 10, 32, self.osd_info["mode"], color=(0, 255, 255))
         # 初始数字
@@ -361,7 +359,7 @@ class LineFollowingCar:
             count = self.return_trip_crosses if self.is_returning else self.cross_count
             self.osd_img.draw_string_advanced(10, 10, 24, f"{prefix} Angle: {self.osd_info['angle']:.1f}", color=(0, 255, 255))
             self.osd_img.draw_string_advanced(10, 40, 24, f"{prefix} Cross: {count}", color=(0, 255, 255))
-        
+
         # 全局提示信息
         if self.osd_info["info"]:
             self.osd_img.draw_string_advanced(DISPLAY_WIDTH//2 - 100, DISPLAY_HEIGHT//2 - 20, 40, self.osd_info["info"], color=(255, 0, 0))
@@ -370,7 +368,7 @@ class LineFollowingCar:
         """主循环，运行状态机"""
         self._setup_hardware()
         self._setup_ai()
-        
+
         cross_flag = 0 # 用于防止在同一路口重复触发
 
         while True:
@@ -397,7 +395,7 @@ class LineFollowingCar:
                 ai_img = self.sensor.snapshot(chn=CAM_CHN_ID_2)
                 if ai_img and ai_img.format() == image.RGBP888:
                     det_boxes = self._run_ai_inference(ai_img)
-                    
+
                     # 分析识别结果
                     match_found = False
                     for box in det_boxes:
@@ -418,20 +416,20 @@ class LineFollowingCar:
                             self.mode = MODE_LINE
                             match_found = True
                             break
-                        
+
                         # 如果识别到的数字与初始数字匹配
                         if number == self.initial_number:
                             print(f"Match found! Turning '{turn_cmd}'")
                             self.turn_stack.append(turn_cmd)
                             self._send_uart_cmd(0x00, turn_cmd)
-                            
+
                             self.osd_info["match_res"] = f"MATCH! Turn {turn_cmd.upper()}"
                             self.osd_info["info"] = f"转向: {turn_cmd.upper()}"
                             self.mode = MODE_PAUSED
                             self.pause_until_time = time.ticks_ms() + 2000 # 暂停2秒
                             match_found = True
                             break
-                    
+
                     # 如果遍历完所有目标都没有匹配上，则直行
                     if not match_found and self.initial_number is not None:
                         print("No match found, going forward.")
@@ -446,7 +444,7 @@ class LineFollowingCar:
             elif self.mode == MODE_LINE:
                 line_img = self.sensor.snapshot(chn=CAM_CHN_ID_1)
                 if not line_img: continue
-                
+
                 # A. 检查是否到达终点
                 if (self.is_returning and self.return_trip_crosses <= 0) or \
                    (not self.is_returning and self.initial_number is not None):
@@ -479,7 +477,7 @@ class LineFollowingCar:
                 if cross_detected and cross_flag == 0:
                     cross_flag = 1
                     self._send_uart_cmd(0x00, 's') # 路口停车
-                    
+
                     if self.is_returning: # 返程路口处理
                         self.return_trip_crosses -= 1
                         print(f"Return cross detected. Remaining: {self.return_trip_crosses}")
@@ -499,7 +497,7 @@ class LineFollowingCar:
                         self.osd_info["cross_count"] = self.cross_count
                         print(f"Forward cross detected, switching to AI. Count: {self.cross_count}")
                         self.mode = MODE_DETECTION
-                
+
                 elif not cross_detected and cross_flag == 1:
                     cross_flag = 0 # 离开路口，重置标志
 
@@ -507,7 +505,7 @@ class LineFollowingCar:
             elif self.mode == MODE_WAIT_M:
                 self.osd_info["mode"] = "等待返程"
                 self.osd_info["info"] = "等待m指令..."
-            
+
             # ----------------- 完成模式 -----------------
             elif self.mode == MODE_FINISHED:
                 self.osd_info["mode"] = "完成"
