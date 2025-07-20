@@ -7,6 +7,8 @@ const uint32_t motor_base_speed = 45;
 volatile uint8_t find_line_en = 0;
 volatile uint8_t turn_dir = '0';
 volatile uint8_t ble_flag = '0'; //从小车1接收到的标志位
+volatile MODE_Type mode = UNKNOWN;
+uint8_t arrived_1_flag = 0; //是否到过1号病房
 
 Motor_Handle motor_left = {
     .in2_port = GPIO_MOTOR_DIR_PORT,
@@ -42,8 +44,11 @@ void Board_Init(void)
     DL_TimerA_startCounter(MOTOR_INST);
     DL_TimerA_startCounter(SERVO_INST);
     DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
+    DL_UART_Main_enableInterrupt(UART_1_INST, DL_UART_MAIN_INTERRUPT_RX);
     NVIC_ClearPendingIRQ(K230_INST_INT_IRQN);
     NVIC_EnableIRQ(K230_INST_INT_IRQN);
+    NVIC_ClearPendingIRQ(UART_1_INST_INT_IRQN);
+    NVIC_EnableIRQ(UART_1_INST_INT_IRQN);
     NVIC_ClearPendingIRQ(GPIO_ENCODER_INT_IRQN);
     NVIC_EnableIRQ(GPIO_ENCODER_INT_IRQN);
 }

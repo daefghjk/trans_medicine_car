@@ -14,6 +14,12 @@
 #define WHELL_DIAMETER      0.065   //车轮直径
 #define ROTARY_SHAFT_DIS    0.09   //转轴距离
 
+typedef enum{
+    EXTRA_1,
+    EXTRA_2,
+    UNKNOWN
+} MODE_Type;
+
 extern uint8_t Key_Num;
 extern volatile uint64_t Systick_Count;
 extern Motor_Handle motor_left, motor_right;
@@ -25,6 +31,8 @@ extern volatile int32_t left_count;
 extern volatile int32_t right_count;
 extern volatile uint8_t turn_dir;
 extern volatile uint8_t ble_flag;
+extern volatile MODE_Type mode;
+extern uint8_t arrived_1_flag;
 
 void Board_Init(void);
 void Motor_SetAllDir(Motor_DirectionType dir);

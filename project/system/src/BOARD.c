@@ -43,8 +43,11 @@ void Board_Init(void)
     DL_TimerA_startCounter(MOTOR_INST);
     DL_TimerA_startCounter(SERVO_INST);
     DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
+    DL_UART_Main_enableInterrupt(UART_1_INST, DL_UART_MAIN_INTERRUPT_RX);
     NVIC_ClearPendingIRQ(K230_INST_INT_IRQN);
     NVIC_EnableIRQ(K230_INST_INT_IRQN);
+    NVIC_ClearPendingIRQ(UART_1_INST_INT_IRQN);
+    NVIC_EnableIRQ(UART_1_INST_INT_IRQN);
     NVIC_ClearPendingIRQ(GPIO_ENCODER_INT_IRQN);
     NVIC_EnableIRQ(GPIO_ENCODER_INT_IRQN);
 }

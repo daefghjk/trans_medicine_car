@@ -9,7 +9,7 @@
 	<createSlaveProjects value=""/>
 	<ignoreDefaultDeviceSettings value="true"/>
 	<ignoreDefaultCCSSettings value="true"/>
-	<templateProperties value="id=empty_LP_MSPM0G3507_nortos_ticlang.projectspec.trans_medicine_car,buildProfile=release,isHybrid=true"/>
+	<templateProperties value="id=empty_LP_MSPM0G3507_nortos_ticlang.projectspec.project2,buildProfile=release,isHybrid=true"/>
 	<activeTargetConfiguration value="targetConfigs/MSPM0G3507.ccxml"/>
 	<isTargetConfigurationManual value="false"/>
 	<sourceLookupPath value="${COM_TI_MSPM0_SDK_INSTALL_DIR}/source/ti/driverlib"/>

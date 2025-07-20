@@ -142,12 +142,12 @@ GPIO6.associatedPins[0].pin.$assign = "PB10";
 
 GPIO7.$name                         = "GPIO_LED";
 GPIO7.associatedPins.create(3);
-GPIO7.associatedPins[0].$name       = "PIN_LED0";
-GPIO7.associatedPins[0].pin.$assign = "PB11";
-GPIO7.associatedPins[1].$name       = "PIN_LED1";
+GPIO7.associatedPins[0].$name       = "PIN_RED";
+GPIO7.associatedPins[0].pin.$assign = "PA7";
+GPIO7.associatedPins[1].$name       = "PIN_YELLOW";
 GPIO7.associatedPins[1].pin.$assign = "PB12";
-GPIO7.associatedPins[2].$name       = "PIN_LED2";
-GPIO7.associatedPins[2].pin.$assign = "PA7";
+GPIO7.associatedPins[2].$name       = "PIN_GREEN";
+GPIO7.associatedPins[2].pin.$assign = "PB11";
 
 GPIO8.$name                         = "GPIO_MPU6050";
 GPIO8.port                          = "PORTB";
@@ -179,13 +179,13 @@ I2C2.sclPinConfig.$name        = "ti_driverlib_gpio_GPIOPinGeneric3";
 
 PWM1.$name                      = "MOTOR";
 PWM1.ccIndex                    = [2,3];
-PWM1.PWM_CHANNEL_3.$name        = "ti_driverlib_pwm_PWMTimerCC3";
-PWM1.ccp2PinConfig.$name        = "ti_driverlib_gpio_GPIOPinGeneric18";
-PWM1.ccp3PinConfig.$name        = "ti_driverlib_gpio_GPIOPinGeneric19";
 PWM1.peripheral.$assign         = "TIMA0";
 PWM1.peripheral.ccp2Pin.$assign = "PA15";
 PWM1.peripheral.ccp3Pin.$assign = "PA12";
 PWM1.PWM_CHANNEL_2.$name        = "ti_driverlib_pwm_PWMTimerCC0";
+PWM1.PWM_CHANNEL_3.$name        = "ti_driverlib_pwm_PWMTimerCC3";
+PWM1.ccp2PinConfig.$name        = "ti_driverlib_gpio_GPIOPinGeneric18";
+PWM1.ccp3PinConfig.$name        = "ti_driverlib_gpio_GPIOPinGeneric19";
 
 PWM2.$name                              = "SERVO";
 PWM2.clockDivider                       = 8;

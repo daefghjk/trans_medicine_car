@@ -117,8 +117,21 @@ int main(void)
 {
     Board_Init();
 
-    while (DL_GPIO_readPins(GPIO_INFRARED_PORT, GPIO_INFRARED_PIN_INFRARED_PIN));
+    while (mode == UNKNOWN) //等待确定拓展第几问
+    {
+        if (ble_flag == '1')
+            mode = EXTRA_1;
+        else if (ble_flag == '2')
+            mode = EXTRA_2;
+    }
+
+    while (ble_flag != 'f'); //等待小车1启动命令
     turn_dir = 'f';
+    if (mode == EXTRA_1)
+        while (DL_GPIO_readPins(GPIO_INFRARED_PORT, GPIO_INFRARED_PIN_INFRARED_PIN));
+    else if (mode == EXTRA_2)
+        while (!DL_GPIO_readPins(GPIO_INFRARED_PORT, GPIO_INFRARED_PIN_INFRARED_PIN));
+    
 
     while (1)
     {
@@ -169,9 +182,27 @@ int main(void)
                 find_line_en = 0;
                 Move_Meter(0.3);
                 Rotate_Angle(240);
-                BLE_SendCmd('b');
-                while (!DL_GPIO_readPins(GPIO_INFRARED_PORT, GPIO_INFRARED_PIN_INFRARED_PIN));
-                
+                if (!arrived_1_flag)    //到1号病房
+                {
+                    if (mode == EXTRA_1)    //拓展1，确认到达1号病房，小车1可以返程
+                    {
+                        DL_GPIO_setPins(GPIO_LED_PIN_LED_YELLOW_PORT, GPIO_LED_PIN_LED_YELLOW_PIN);
+                        BLE_SendCmd('b');
+                        while (ble_flag != 'n');   //等待小车1发送熄灭黄灯命令
+                        DL_GPIO_clearPins(GPIO_LED_PIN_LED_YELLOW_PORT, GPIO_LED_PIN_LED_YELLOW_PIN);
+                    }
+                    while (ble_flag != 'f'); //等待启动命令
+                    arrived_1_flag = 1;
+                }
+                else    //到了目标病房
+                {
+                    DL_GPIO_setPins(GPIO_LED_PIN_LED_RED_PORT, GPIO_LED_PIN_LED_RED_PIN);
+                    if (mode == EXTRA_1)
+                        while (!DL_GPIO_readPins(GPIO_INFRARED_PORT, GPIO_INFRARED_PIN_INFRARED_PIN));
+                    else if (mode == EXTRA_2)
+                        while (DL_GPIO_readPins(GPIO_INFRARED_PORT, GPIO_INFRARED_PIN_INFRARED_PIN));
+                    DL_GPIO_clearPins(GPIO_LED_PIN_LED_RED_PORT, GPIO_LED_PIN_LED_RED_PIN);
+                }
                 K230_SendCmd('m');
                 turn_dir = 'f';
                 find_line_en = 1;
@@ -182,6 +213,7 @@ int main(void)
                 find_line_en = 0;
                 Move_Meter(0.2);
                 Motor_SetAllDir(MOTOR_DIR_STOP);
+                DL_GPIO_setPins(GPIO_LED_PIN_LED_GREEN_PORT, GPIO_LED_PIN_LED_GREEN_PIN);
                 turn_dir = '0';
                 DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 break;

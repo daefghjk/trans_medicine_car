@@ -176,6 +176,7 @@ int main(void)
                 find_line_en = 0;
                 Move_Meter(0.3);
                 Rotate_Angle(240);
+                DL_GPIO_setPins(GPIO_LED_PIN_RED_PORT, GPIO_LED_PIN_RED_PIN);
                 if (mode == EXTRA_1)    
                 {
                     BLE_SendCmd('f');       //启动小车2到1号病房
@@ -186,6 +187,7 @@ int main(void)
                     BLE_SendCmd('n');
                 if (mode == EXTRA_2)    //拓展第二题在小车1启动返程后就让小车2到1号病房
                     BLE_SendCmd('f');
+                DL_GPIO_clearPins(GPIO_LED_PIN_RED_PORT, GPIO_LED_PIN_RED_PIN);
                 K230_SendCmd('m');
                 turn_dir = 'f';
                 find_line_en = 1;
@@ -196,6 +198,7 @@ int main(void)
                 find_line_en = 0;
                 Move_Meter(0.2);
                 Motor_SetAllDir(MOTOR_DIR_STOP);
+                DL_GPIO_setPins(GPIO_LED_PIN_GREEN_PORT, GPIO_LED_PIN_GREEN_PIN);
                 if (mode == EXTRA_1 || mode == EXTRA_2) //拓展在小车1回到药房后才使小车2从1号病房启动
                     BLE_SendCmd('f');
                 turn_dir = '0';
