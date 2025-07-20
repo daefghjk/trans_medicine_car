@@ -27,6 +27,29 @@ void K230_ProcessRxData(uint8_t flag)
             float_str[buffer_index] = '\0';
             delta_angle = atof(float_str);
             break;
+        
+        case K230_FLAG_MODE:
+            if (mode == EXTRA)
+            {
+                if (k230_rx_buffer[0] == 'm')
+                {
+                    mode = EXTRA_1;
+                    BLE_SendCmd('1');
+                }
+                else if (k230_rx_buffer[0] == 'f')
+                {
+                    mode = EXTRA_2;
+                    BLE_SendCmd('2');
+                }
+            }
+            else if (mode == BASE)
+            {
+                if (k230_rx_buffer[0] == 'm')
+                    mode = BASE_1;
+                else if (k230_rx_buffer[0] == 'f')
+                    mode = BASE_2;
+            }
+            break;
 
         default:
             break;

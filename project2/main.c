@@ -169,20 +169,10 @@ int main(void)
                 find_line_en = 0;
                 Move_Meter(0.3);
                 Rotate_Angle(240);
-                BLE_SendCmd('t');   //测试是否有小车2
-                Delay_ms(2000);
-                if (ble_flag == 'r')
-                {
-                    mode = 2;
-                    ble_flag = '0';
-                    while (ble_flag != 'b');
-                }
-                else
-                    mode = 1;
+                BLE_SendCmd('b');
                 while (!DL_GPIO_readPins(GPIO_INFRARED_PORT, GPIO_INFRARED_PIN_INFRARED_PIN));
+                
                 K230_SendCmd('m');
-                if (mode == 2)
-                    BLE_SendCmd('f');
                 turn_dir = 'f';
                 find_line_en = 1;
                 DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);

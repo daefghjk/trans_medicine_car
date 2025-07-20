@@ -117,7 +117,13 @@ int main(void)
 {
     Board_Init();
 
-    while (DL_GPIO_readPins(GPIO_INFRARED_PORT, GPIO_INFRARED_PIN_INFRARED_PIN));
+    while (DL_GPIO_readPins(GPIO_INFRARED_PORT, GPIO_INFRARED_PIN_INFRARED_PIN))
+    {
+        BLE_SendCmd('t');   //测试是否有小车2
+        Delay_ms(100);
+        if (ble_flag == 'r')
+            mode = EXTRA;
+    }
     turn_dir = 'f';
 
     while (1)
@@ -165,24 +171,22 @@ int main(void)
                 DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 break;
             case 'b':
+                while (mode == BASE || mode == EXTRA);  //等待k230回传得到目前是什么模式
                 DL_UART_Main_disableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 find_line_en = 0;
                 Move_Meter(0.3);
                 Rotate_Angle(240);
-                BLE_SendCmd('t');   //测试是否有小车2
-                Delay_ms(2000);
-                if (ble_flag == 'r')
+                if (mode == EXTRA_1)    
                 {
-                    mode = 2;
-                    ble_flag = '0';
-                    while (ble_flag != 'b');
+                    BLE_SendCmd('f');       //启动小车2到1号病房
+                    while (ble_flag != 'b');//拓展第一题需要等待小车2到达1号病房，不然会撞车
                 }
-                else
-                    mode = 1;
                 while (!DL_GPIO_readPins(GPIO_INFRARED_PORT, GPIO_INFRARED_PIN_INFRARED_PIN));
-                K230_SendCmd('m');
-                if (mode == 2)
+                if (mode == EXTRA_1)    //拓展第一题小车1返程需要告诉小车2熄灭黄色LED
+                    BLE_SendCmd('n');
+                if (mode == EXTRA_2)    //拓展第二题在小车1启动返程后就让小车2到1号病房
                     BLE_SendCmd('f');
+                K230_SendCmd('m');
                 turn_dir = 'f';
                 find_line_en = 1;
                 DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
@@ -192,6 +196,8 @@ int main(void)
                 find_line_en = 0;
                 Move_Meter(0.2);
                 Motor_SetAllDir(MOTOR_DIR_STOP);
+                if (mode == EXTRA_1 || mode == EXTRA_2) //拓展在小车1回到药房后才使小车2从1号病房启动
+                    BLE_SendCmd('f');
                 turn_dir = '0';
                 DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 break;

@@ -6,8 +6,7 @@ const float Kp = 0.45, Kd = 1.5;
 const uint32_t motor_base_speed = 45;
 volatile uint8_t find_line_en = 0;
 volatile uint8_t turn_dir = '0';
-volatile uint8_t ble_flag = '0'; //从小车2接收到的标志位，r为接收到小车1发出的命令；b为小车2到达病房，可以返程
-uint8_t mode = 1;   //1为基础部分，2为发挥部分
+volatile uint8_t ble_flag = '0'; //从小车1接收到的标志位
 
 Motor_Handle motor_left = {
     .in2_port = GPIO_MOTOR_DIR_PORT,

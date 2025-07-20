@@ -6,6 +6,7 @@
 
 #define K230_FLAG_DIR   0x00
 #define K230_FLAG_ANGLE 0x01
+#define K230_FLAG_MODE  0x02
 
 #define K230_FLAG_CMD   0x00
 

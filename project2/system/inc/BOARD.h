@@ -25,7 +25,6 @@ extern volatile int32_t left_count;
 extern volatile int32_t right_count;
 extern volatile uint8_t turn_dir;
 extern volatile uint8_t ble_flag;
-extern uint8_t mode;
 
 void Board_Init(void);
 void Motor_SetAllDir(Motor_DirectionType dir);
