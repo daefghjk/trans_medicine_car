@@ -124,8 +124,10 @@ int main(void)
         else if (ble_flag == '2')
             mode = EXTRA_2;
     }
+    OLED_ShowNum(1, 1, mode, 1);
 
     while (ble_flag != 'f'); //等待小车1启动命令
+    OLED_ShowString(2, 1, "OK:f");
     turn_dir = 'f';
     if (mode == EXTRA_1)
         while (DL_GPIO_readPins(GPIO_INFRARED_PORT, GPIO_INFRARED_PIN_INFRARED_PIN));
@@ -191,6 +193,7 @@ int main(void)
                         while (ble_flag != 'n');   //等待小车1发送熄灭黄灯命令
                         DL_GPIO_clearPins(GPIO_LED_PIN_LED_YELLOW_PORT, GPIO_LED_PIN_LED_YELLOW_PIN);
                     }
+                    ble_flag = '0';
                     while (ble_flag != 'f'); //等待启动命令
                     arrived_1_flag = 1;
                 }

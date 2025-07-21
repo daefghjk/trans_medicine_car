@@ -42,11 +42,9 @@ void K230_ProcessRxData(uint8_t flag)
                     BLE_SendCmd('2');
                 }
             }
-            else if (mode == BASE)
+            else if (mode == BASE_1)
             {
                 if (k230_rx_buffer[0] == 'm')
-                    mode = BASE_1;
-                else if (k230_rx_buffer[0] == 'f')
                     mode = BASE_2;
             }
             break;

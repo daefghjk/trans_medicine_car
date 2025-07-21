@@ -51,7 +51,7 @@ void Move_Meter(float meter)
         if ((abs(current_left_count) + abs(current_right_count)) / 2 >= target_count)
             break;
 
-        int32_t delta = 0.2 * (abs(current_left_count) - abs(current_right_count));
+        int32_t delta = 0.5 * (abs(current_left_count) - abs(current_right_count));
 
         int32_t left_speed = motor_base_speed - delta;
         int32_t right_speed = motor_base_speed + delta;
@@ -154,7 +154,7 @@ int main(void)
                 DL_UART_Main_disableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 find_line_en = 0;
                 Move_Meter(0.4);
-                Rotate_Angle(-130);
+                Rotate_Angle(-120);
                 Motor_SetAllDir(MOTOR_DIR_FORWARD);
                 turn_dir = 'f';
                 find_line_en = 1;
@@ -171,7 +171,7 @@ int main(void)
                 DL_UART_Main_enableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 break;
             case 'b':
-                while (mode == BASE || mode == EXTRA);  //等待k230回传得到目前是什么模式
+                while (mode == EXTRA);  //等待k230回传得到目前是什么模式
                 DL_UART_Main_disableInterrupt(K230_INST, DL_UART_MAIN_INTERRUPT_RX);
                 find_line_en = 0;
                 Move_Meter(0.3);

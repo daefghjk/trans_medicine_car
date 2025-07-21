@@ -2,7 +2,7 @@
 
 uint8_t Key_Num = 255;
 volatile uint64_t Systick_Count = 0;
-const float Kp = 0.45, Kd = 1.5;
+const float Kp = 0.35, Kd = 1;
 const uint32_t motor_base_speed = 45;
 volatile uint8_t find_line_en = 0;
 volatile uint8_t turn_dir = '0';

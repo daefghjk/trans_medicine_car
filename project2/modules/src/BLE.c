@@ -13,7 +13,7 @@ void BLE_ProcessRxData(void)
     if (ble_rx_buffer_index > 1) return;
     ble_flag =  ble_rx_buffer[0];
     if (ble_flag == 't')
-        DL_UART_Main_transmitDataBlocking(UART_1_INST, 'r'); //立刻回传
+        BLE_SendCmd('r');//立刻回传
 }
 
 void BLE_RxCallback(void)
