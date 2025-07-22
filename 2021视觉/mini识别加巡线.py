@@ -167,7 +167,7 @@ def line_detection(img, osd_img=None):
             else:
                 roi_centers[idx] = largest_blob.cx()
             # 路口检测：只用最上面ROI的宽色块
-            if idx == 2 and w > 400:
+            if idx == 2 and w > 170:
                 cross_detected = True
         else:
             rects.append(None)
